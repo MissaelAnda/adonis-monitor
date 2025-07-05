@@ -37,7 +37,7 @@ export abstract class EntryStore {
   abstract flush(): void
 }
 
-export class MemoryEntryStore extends EntryStore {
+export class DatabaseEntryStore extends EntryStore {
   #entries: Entry<any>[] = []
 
   #chunkSize: number = 1000

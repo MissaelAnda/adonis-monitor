@@ -5,7 +5,7 @@ import { RuntimeException } from '@adonisjs/core/exceptions'
 import type { MonitorConfig } from '../types.js'
 import { LogFn, Logger } from 'pino'
 import is from '@adonisjs/core/helpers/is'
-import { MemoryEntryStore, EntryStore } from '../store/entry_store.js'
+import { DatabaseEntryStore, EntryStore } from '../store/entry_store.js'
 import { LogEvent, LogLevel } from '../monitors/log.js'
 import { ErrorEvent } from '../monitors/error.js'
 
@@ -24,7 +24,7 @@ export default class MonitorProvider {
    */
   register() {
     this.app.container.bind(EntryStore, async (container) => {
-      return await container.make(MemoryEntryStore)
+      return await container.make(DatabaseEntryStore)
     })
 
     this.app.container.singleton(MonitorManager, async (container) => {
