@@ -67,7 +67,7 @@ export class RequestMonitor extends Monitor<RequestType> {
       truncateResponseBody: true,
       responseBodyMaxSize: 5000,
       truncateHtml: true,
-      sensitiveDataPatterns: [/_token/, /cookie/],
+      sensitiveDataPatterns: [/_token/, /cookie/, /username/, /password/],
     }
   }
 
