@@ -59,10 +59,11 @@ Registers all authorization calls with data and result.
     - [x] Errors
     - [x] Cache
     - [ ] Bouncer
-    - [ ] Events
-    - [ ] Logs
+    - [x] Events
+    - [x] Logs
     - [ ] Mail (with a html preview)
-    - [ ] Query
+    - [x] Query
     - [ ] Commands
-- [ ] Find a way to link related entries like requests to every cache, bouncer, error, etc. that happened during the request
-- [ ] Fix the config file types
+- [ ] Find a way to link related entries like requests to every cache, bouncer, error, etc. that happened during the request.
+- [ ] Fix the config file types.
+- [ ] Add customizable filters and ordering.
