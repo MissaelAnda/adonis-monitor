@@ -2,6 +2,8 @@
 
 A proof-of-concept plug-and-play and customizable Monitoring system that register all events in your application.
 
+![Frontend](./docs/frontend.png)
+
 Monitors are classes that extend from the base abstract `Monitor` class this allows each monitor to define it's own configuration, transformers, filters and most importantly it's handler that will send entries to the `EntryStore` to be stored in some DB.
 
 The `EntryStore` is also an abstract class that allows to change the default `DatabaseEntryStore` which saves all entries to an standard SQL database using Lucid.
