@@ -1,16 +1,16 @@
 /// <reference path="../types.ts" />
 
-import { HttpRequestFinishedPayload } from "@adonisjs/core/types/http"
+import { HttpRequestFinishedPayload, StoreRouteHandler } from "@adonisjs/core/types/http"
 import Monitor from "./base.js"
 import { IncomingHttpHeaders } from "http"
-import type { EntryFilterFn, EntryTransformerFn, MonitorBaseConfig } from "../types.js"
+import type { EntryFilterFn, EntryTransformerFn, HandlerInfo, MonitorBaseConfig } from "../types.js"
 import { ApplicationService } from "@adonisjs/core/types"
 import monitor from "../service/main.js"
 import { Response } from '@adonisjs/http-server'
+import { formatHandler } from "../helpers.js"
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-// type ExtractMethodNames<T> = { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T];
-// type ExtractMethods<T> = Pick<T, ExtractMethodNames<T>>;
+
 type RequestEntryPayload = {
   duration: [number, number],
   user?: {
@@ -19,8 +19,8 @@ type RequestEntryPayload = {
   },
   route?: {
     name?: string,
-    handler: string,
-    middleware: string[],
+    handler: HandlerInfo,
+    middleware: HandlerInfo[],
     pattern: string,
     meta: Record<string, any>,
   },
@@ -39,6 +39,7 @@ type RequestEntryPayload = {
   response: {
     headers: ReturnType<Pick<Response, 'getHeaders'>['getHeaders']>,
     body: any,
+    status: number,
   },
 }
 
@@ -52,6 +53,10 @@ type RequestMonitorConfiguration = MonitorBaseConfig<RequestType> & {
 type RequestType = 'request'
 export class RequestMonitor extends Monitor<RequestType> {
   get name(): RequestType { return 'request' }
+
+  get title(): string { return 'Requests' }
+
+  get routeName(): string { return 'requests' }
 
   get filters() {
     return [this.#filterMonitorRequests(), ...super.filters]
@@ -67,7 +72,7 @@ export class RequestMonitor extends Monitor<RequestType> {
       truncateResponseBody: true,
       responseBodyMaxSize: 5000,
       truncateHtml: true,
-      sensitiveDataPatterns: [/_token/, /cookie/, /username/, /password/],
+      sensitiveDataPatterns: [/_token/, /cookie/, /username/, /password/, /authorization/],
     }
   }
 
@@ -87,10 +92,8 @@ export class RequestMonitor extends Monitor<RequestType> {
       } : undefined,
       route: route ? {
         name: route!.name,
-        handler: 'UserController@index',
-        // handler: formatHandler(route!.handler),
-        // middleware: route!.middleware,
-        middleware: [],
+        handler: formatHandler(typeof route!.handler == 'function' ? route!.handler : route!.handler.reference),
+        middleware: route!.middleware.all().entries().map(([middleware, _]) => formatHandler(typeof middleware == 'function' ? middleware : middleware.name!)).toArray(),
         pattern: route!.pattern,
         meta: route!.meta,
       } : undefined,
@@ -109,15 +112,16 @@ export class RequestMonitor extends Monitor<RequestType> {
       response: {
         headers: response.getHeaders(),
         body: response.getBody(),
+        status: response.getStatus(),
       },
     }
   }
 
   #filterMonitorRequests(): EntryFilterFn<RequestType> {
     return (entry) => {
-      const { route } = entry.payload
+      const { route, request } = entry.payload
       // Don't log monitor requests
-      return route?.name === monitor.routeName
+      return route?.name === monitor.routeName || request.url.startsWith('/inertia')
       // Only log requests that took over 1 second
       // duration.seconds > 1
     }

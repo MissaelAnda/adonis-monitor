@@ -1,18 +1,23 @@
 import { ApplicationService, EmitterService } from "@adonisjs/core/types"
 import Monitor from "./base.js"
-import is from '@adonisjs/core/helpers/is'
 import { AllowedEventTypes } from "@adonisjs/events/types"
 import { HttpRequestFinishedPayload } from "@adonisjs/http-server/types"
+import { formatHandler } from "../helpers.js"
+import { HandlerInfo } from "../types.js"
 
 type EventEntryPayload = {
   event: AllowedEventTypes,
   data: any,
-  listeners: string[],
+  listeners: HandlerInfo[],
 }
 
 type EventType = 'event'
 export class EventMonitor extends Monitor<EventType> {
   get name(): EventType { return 'event' }
+
+  get title(): string { return 'Events' }
+
+  get routeName(): string { return 'events' }
 
   get defaultConfig() { return this.baseConfig() }
 
@@ -49,32 +54,7 @@ export class EventMonitor extends Monitor<EventType> {
       return []
     }
 
-    const anonymousFunctionFormatter = (func: Function) => {
-      let name = 'Anonymous function'
-      if (func.name != '' || this.app.inDev) {
-        name += ` ${func.name || `\`${func.toString()}\``}`
-      }
-      return name
-    }
-
-    return listeners.entries().map(([key, _]) => {
-      if (typeof key == 'string') {
-        return key
-      }
-
-      if (is.array(key)) {
-        const [klass, handler] = key
-
-        let name = is.class(klass) ? klass.name : anonymousFunctionFormatter(klass)
-        if (handler) {
-          name += `@${handler}`
-        }
-
-        return name
-      }
-
-      return anonymousFunctionFormatter(key)
-    }).toArray()
+    return listeners.entries().map(([listener, _]) => formatHandler(listener)).toArray()
   }
 }
 

@@ -2,25 +2,32 @@ import { NextFn } from "@adonisjs/core/types/http"
 import { errors, HttpContext } from "@adonisjs/core/http"
 import { ApplicationService } from "@adonisjs/core/types"
 import is from '@adonisjs/core/helpers/is'
-import string from '@adonisjs/core/helpers/string'
-import { AuthData, Entry, MonitorConfig, Monitors } from "./types.js"
+import { AuthData, Entry, EntryType, MonitorConfig } from "./types.js"
 import Monitor from "./monitors/base.js"
 import { EntryStore } from "./store/entry_store.js"
 import { AuthenticatorClient, AuthManager } from "@adonisjs/auth"
 import { Authenticators } from "@adonisjs/auth/types"
 
 export default class MonitorManager {
-  declare protected monitors: Monitors
+  declare protected monitors: Monitor<EntryType>[]
   declare protected authClient: AuthenticatorClient<Authenticators>
 
-  get resources(): string[] {
-    return Object.keys(this.monitors)
+  get resources(): Monitor<EntryType>[] {
+    return this.monitors
   }
 
   set enabled(enabled: boolean) { this.config.enabled = enabled }
   get enabled() { return this.config.enabled }
 
   getStore() { return this.store }
+
+  findMonitorByRouteName(routeName: string): Monitor<EntryType> | undefined {
+    return this.monitors.find(resource => resource.routeName == routeName)
+  }
+
+  findMonitorByName(name: string): Monitor<EntryType> | undefined {
+    return this.monitors.find(resource => resource.name == name)
+  }
 
   constructor(
     protected app: ApplicationService,
@@ -90,15 +97,22 @@ export default class MonitorManager {
   }
 
   #monitorMiddleware() {
+    const throwNotFound = (request: HttpContext['request']) => {
+      throw new errors.E_ROUTE_NOT_FOUND([request.method(), request.url()])
+    }
+
     return async ({ request, response }: HttpContext, next: NextFn) => {
       const resource = request.param('resource')
       if (resource == null) {
-        return response.redirect().toRoute(this.routeName, { resource: string.plural(this.resources[0]) })
+        if (this.resources.length == 0) {
+          throwNotFound(request)
+        }
+
+        return response.redirect().toRoute(this.routeName, { resource: this.resources[0].routeName })
       }
 
-      const resourceName = string.singular(resource).toLowerCase()
-      if (!this.resources.find(r => r.toLowerCase() == resourceName)) {
-        throw new errors.E_ROUTE_NOT_FOUND([request.method(), request.url()])
+      if (!this.resources.find(r => r.routeName == resource)) {
+        throwNotFound(request)
       }
 
       // Normalize url
@@ -111,7 +125,7 @@ export default class MonitorManager {
   }
 
   async #initializeMonitors() {
-    this.monitors = {}
+    this.monitors = []
     const monitors = await Promise.all(this.config.monitors.map(async monitor => {
       let config = {}
 
@@ -135,7 +149,7 @@ export default class MonitorManager {
     }))
 
     for (const monitor of monitors) {
-      this.monitors[monitor.name] = monitor
+      this.monitors.push(monitor)
     }
   }
 

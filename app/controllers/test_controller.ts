@@ -5,6 +5,7 @@ import cache from '@adonisjs/cache/services/main'
 
 export default class TestController {
   async handle(_: HttpContext) {
+    // throw new Error('Custom error')
     logger.trace('TRACE')
     logger.debug('DEBUG')
     logger.info('INFO')
@@ -16,5 +17,9 @@ export default class TestController {
     cache.get({ key: 'cacheKey' })
 
     await User.query().select('error').first()
+  }
+
+  async post({ request }: HttpContext) {
+    return { message: 'ok' }
   }
 }

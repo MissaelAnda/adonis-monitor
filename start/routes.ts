@@ -12,3 +12,4 @@ import router from '@adonisjs/core/services/router'
 
 router.on('/').renderInertia('home')
 router.get('/test', [TestController])
+router.get('/test/2', [TestController, 'post'])

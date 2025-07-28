@@ -14,6 +14,10 @@ type CacheType = 'cache'
 export class CacheMonitor extends Monitor<CacheType> {
   get name(): CacheType { return 'cache' }
 
+  get title(): string { return 'Cache' }
+
+  get routeName(): string { return 'cache' }
+
   get defaultConfig() { return this.baseConfig() }
 
   async register(app: ApplicationService) {

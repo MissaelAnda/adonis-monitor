@@ -9,6 +9,10 @@ type MailType = 'mail'
 export class MailMonitor extends Monitor<MailType> {
   get name(): MailType { return 'mail' }
 
+  get title(): string { return 'Mails' }
+
+  get routeName(): string { return 'mails' }
+
   get defaultConfig() { return this.baseConfig() }
 
   async register(app: ApplicationService) {

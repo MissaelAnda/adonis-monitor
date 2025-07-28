@@ -3,16 +3,21 @@ import MonitorEntry from "./monitor_entry.js"
 import { UUID } from "node:crypto"
 import { BaseModel } from "@adonisjs/lucid/orm"
 
+type Sort = { field: string, sort: 'asc' | 'desc' }
 type EntryPagination = {
   page: number,
-  size: number,
-  sorts: [],
-  filters: [],
+  size?: number | null,
+  sorts?: Sort[],
+  filters?: string[],
 }
 
 type EntryPaginationResponse<Type extends EntryType> = {
   entries: Entry<Type>[],
-  total: number,
+  pagination: {
+    total: number,
+    currentPage: number,
+    hasMorePages: boolean,
+  }
 }
 
 /**
@@ -48,12 +53,29 @@ export class DatabaseEntryStore extends EntryStore {
   }
 
   async get<Type extends EntryType>(type: Type, options?: EntryPagination): Promise<EntryPaginationResponse<Type>> {
-    const paginationResult = await MonitorEntry.query().where('type', type).orderBy('created_at', 'desc').paginate(options?.page ?? 1, options?.size ?? 20)
+    let query = MonitorEntry.query().where('type', type).orderBy('created_at', 'desc')
+
+    // Apply sort by `created_at` descending only if the user didn't apply a custom sort for that field
+    if (!options?.sorts || options.sorts.findIndex((s) => s.field == 'created_at') < 0) {
+      query.orderBy('created_at', 'desc')
+    }
+
+    if (!!options?.sorts) {
+      for (const sorting of options!.sorts ?? []) {
+        query.orderBy(sorting.field, sorting.sort)
+      }
+    }
+
+    const paginationResult = await query.paginate(options?.page ?? 1, options?.size ?? 20)
     const entries = paginationResult.all() as MonitorEntry<Type>[]
 
     return {
       entries: entries.map(entry => entry.toEntry()),
-      total: paginationResult.total,
+      pagination: {
+        total: paginationResult.total,
+        currentPage: paginationResult.currentPage,
+        hasMorePages: paginationResult.hasMorePages,
+      }
     }
   }
 

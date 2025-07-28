@@ -1,3 +1,5 @@
+import monitor from '#monitor/service/main'
+import router from '@adonisjs/core/services/router'
 import { defineConfig } from '@adonisjs/inertia'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 
@@ -5,13 +7,24 @@ const inertiaConfig = defineConfig({
   /**
    * Path to the Edge view that will be used as the root view for Inertia responses
    */
-  rootView: 'inertia_layout',
+  rootView: ({ route }) => {
+    if (route?.name == monitor.routeName) {
+      return 'monitor_layout'
+    }
+    return 'inertia_layout'
+  },
 
   /**
    * Data that should be shared with all rendered pages
    */
   sharedData: {
-    // user: (ctx) => ctx.inertia.always(() => ctx.auth.user),
+    monitor: (ctx) => ({
+      user: ctx.inertia.always(() => ctx.auth.user),
+      resources: monitor.resources.map(resource => resource.toJSON()),
+      url: router.makeUrl(monitor.routeName, {
+        resource: '{resource}',
+      }).replace('{resource}', '')
+    })
   },
 
   /**
@@ -26,5 +39,5 @@ const inertiaConfig = defineConfig({
 export default inertiaConfig
 
 declare module '@adonisjs/inertia/types' {
-  export interface SharedProps extends InferSharedProps<typeof inertiaConfig> {}
+  export interface SharedProps extends InferSharedProps<typeof inertiaConfig> { }
 }

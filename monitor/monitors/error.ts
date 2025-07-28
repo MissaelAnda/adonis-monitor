@@ -11,6 +11,10 @@ type ErrorType = 'error'
 export class ErrorMonitor extends Monitor<ErrorType> {
   get name(): ErrorType { return 'error' }
 
+  get title(): string { return 'Errors' }
+
+  get routeName(): string { return 'errors' }
+
   get defaultConfig() { return this.baseConfig() }
 
   async register(app: ApplicationService) {

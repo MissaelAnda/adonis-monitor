@@ -14,6 +14,10 @@ type LogType = 'log'
 export class LogMonitor extends Monitor<LogType> {
   get name(): LogType { return 'log' }
 
+  get title(): string { return 'Logs' }
+
+  get routeName(): string { return 'logs' }
+
   get defaultConfig() { return this.baseConfig() }
 
   async register(app: ApplicationService) {

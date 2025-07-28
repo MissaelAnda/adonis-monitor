@@ -6,8 +6,13 @@ import { DateTime } from "luxon"
 import { Payloads } from "adonis-monitor"
 import { Configurations } from "adonis-monitor"
 import { UUID } from "node:crypto"
+import { LazyImport } from "@adonisjs/events/types"
 
-export type Monitors = Record<string, Monitor<EntryType>>
+export type SerializedMonitor = {
+  name: string,
+  title: string,
+  routeName: string,
+}
 
 // ----------
 // Entries
@@ -18,7 +23,6 @@ export type EntryFilterFn<Type extends EntryType> = (entry: Entry<Type>) => bool
 // TODO: allow transformer to add values but not change them
 // export type EntryTransformerFn<Type extends EntryType, NewPayload extends Payloads[Type]> = (entry: Entry<Type>) => NewPayload
 export type EntryTransformerFn<Type extends EntryType> = (payload: Payloads[Type]) => Payloads[Type]
-
 
 export type AuthData = { id: string | number, guard: string }
 export type Payload<Type extends EntryType> = Payloads[Type] & { auth?: Partial<AuthData> }
@@ -41,6 +45,12 @@ export type MonitorBaseConfig<Type extends EntryType> = {
   enabled: boolean,
   filters: EntryFilterFn<Type>[],
   transformers: EntryTransformerFn<Type>[],
+}
+export type Handler = string | Function | [LazyImport<Constructor<any>> | Constructor<any>, string?]
+export type HandlerInfo = {
+  type: 'function' | 'class' | 'name',
+  name: string,
+  handler?: string,
 }
 
 export type DefinableBaseConfig<Type extends EntryType> = Partial<MonitorBaseConfig<Type>>

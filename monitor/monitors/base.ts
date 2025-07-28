@@ -1,5 +1,5 @@
 import { ApplicationService } from "@adonisjs/core/types"
-import { Entry, EntryFilterFn, EntryTransformerFn, EntryType, MonitorBaseConfig } from "../types.js"
+import { Entry, EntryFilterFn, EntryTransformerFn, EntryType, MonitorBaseConfig, SerializedMonitor } from "../types.js"
 import { DateTime } from "luxon"
 import monitor from '../service/main.js'
 import { Payloads, Configurations } from "adonis-monitor"
@@ -23,6 +23,10 @@ export default abstract class Monitor<Type extends EntryType> {
   }
 
   abstract get name(): Type
+
+  abstract get title(): string
+
+  abstract get routeName(): string
 
   get enabled() {
     return this.config.enabled
@@ -58,5 +62,13 @@ export default abstract class Monitor<Type extends EntryType> {
 
   protected shouldIgnore(entry: Entry<Type>) {
     return !this.enabled || this.filters.findIndex(filter => filter(entry) === true) >= 0
+  }
+
+  toJSON(): SerializedMonitor {
+    return {
+      name: this.name as string,
+      title: this.title,
+      routeName: this.routeName,
+    }
   }
 }
