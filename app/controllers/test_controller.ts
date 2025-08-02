@@ -2,9 +2,13 @@ import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import logger from '@adonisjs/core/services/logger'
 import cache from '@adonisjs/cache/services/main'
+import { editUser } from '#abilities/main'
 
 export default class TestController {
-  async handle(_: HttpContext) {
+  async handle({ bouncer }: HttpContext) {
+    const user = await User.first()
+    await bouncer.authorize('editUser', user)
+
     // throw new Error('Custom error')
     logger.trace('TRACE')
     logger.debug('DEBUG')

@@ -12,12 +12,14 @@
 |
 */
 
-import { Bouncer } from '@adonisjs/bouncer'
+import User from '#models/user'
+import { AuthorizationResponse, Bouncer } from '@adonisjs/bouncer'
 
 /**
  * Delete the following ability to start from
  * scratch
  */
-export const editUser = Bouncer.ability(() => {
+export const editUser = Bouncer.ability({ allowGuest: true }, (user: User | null, toEdit: User | null) => {
   return true
+  // return AuthorizationResponse.deny('Guest can\'t edit user ' + toEdit?.fullName, 403)
 })

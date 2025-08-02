@@ -5,14 +5,20 @@ import { MonitorPageProps, Unary } from '~/types';
 const props = usePage<MonitorPageProps>().props
 const { url, resources } = props.monitor
 
+type Resource = Unary<typeof resources>
 const { isMobileSidebarOpen } = defineProps<{
   isMobileSidebarOpen: boolean,
-  currentResource: Unary<typeof resources>,
+  currentResource: Resource,
 }>()
 
 const emit = defineEmits(['update:isMobileSidebarOpen', 'update:currentResource']);
 
 const closeMobileSidebar = () => emit('update:isMobileSidebarOpen', false)
+
+const selectResource = (resource: Resource) => {
+  emit('update:currentResource', resource)
+  emit('update:isMobileSidebarOpen', false)
+}
 </script>
 
 <template>
@@ -38,7 +44,7 @@ const closeMobileSidebar = () => emit('update:isMobileSidebarOpen', false)
       </div>
       <!-- Mobile close button -->
       <button @click="closeMobileSidebar"
-        class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+        class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
         <div class="w-5 h-5">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -55,7 +61,7 @@ const closeMobileSidebar = () => emit('update:isMobileSidebarOpen', false)
         <Link v-for="resource in resources" :key="resource.name" :href="`${url}${resource.routeName}`"
           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
           :class="{ 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-r-2 border-blue-700 dark:border-blue-500': resource.name == currentResource.name }"
-          @click="emit('update:currentResource', resource)">
+          @click="selectResource(resource)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

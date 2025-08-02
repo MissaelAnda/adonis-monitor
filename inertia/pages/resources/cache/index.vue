@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { DateTime } from 'luxon';
+import Boolean from '~/components/Boolean.vue';
+import ExecutedAt from '~/components/ExecutedAt.vue';
 import ResourceIndex, { Fields } from '~/components/ResourceIndex.vue';
-import Tooltip from '~/components/Tooltip.vue';
 import { MonitorPageProps } from '~/types';
 
 defineProps<MonitorPageProps>()
@@ -11,6 +11,7 @@ const fields: Fields = [
   { name: 'store', title: 'Store' },
   { name: 'key', title: 'Key' },
   { name: 'graced', title: 'Graced' },
+  { name: 'ts', title: 'Executed At' },
 ]
 
 const verbColors = (verb: string) => ({
@@ -33,34 +34,10 @@ const verbColors = (verb: string) => ({
     <template #store="{ entry }">{{ entry.payload.store }}</template>
     <template #key="{ entry }">{{ entry.payload.key }}</template>
     <template #graced="{ entry }">
-      <div v-if="entry.payload.graced === true" class="text-green-300">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <path d="m9 11 3 3L22 4" />
-        </svg>
-      </div>
-      <div v-else-if="entry.payload.graced === false" class="text-red-500">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="m15 9-6 6" />
-          <path d="m9 9 6 6" />
-        </svg>
-      </div>
-      <div v-else>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="8" />
-          <circle cx="12" cy="12" r="4" />
-        </svg>
-      </div>
+      <Boolean :bool="entry.payload.graced" />
     </template>
     <template #ts="{ entry }">
-      <Tooltip>
-        <span>{{ DateTime.fromISO(entry.ts).toRelative({ style: 'short' }) }}</span>
-        <template #tooltip>{{ DateTime.fromISO(entry.ts).toFormat('yyyy-LL-dd HH:mm:ii ZZZZ') }}</template>
-      </Tooltip>
+      <ExecutedAt :ts="entry.ts" />
     </template>
   </ResourceIndex>
 </template>

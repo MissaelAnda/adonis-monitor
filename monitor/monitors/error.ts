@@ -1,10 +1,12 @@
 import { ApplicationService } from "@adonisjs/core/types"
 import Monitor from "./base.js"
+import { DateTime } from "luxon"
 
 type ErrorEntryPayload = ErrorEvent & { error: { class: string } }
 export type ErrorEvent = {
   error: Error,
   message: string,
+  resolvedAt: DateTime | null,
 }
 
 type ErrorType = 'error'
@@ -30,6 +32,7 @@ export class ErrorMonitor extends Monitor<ErrorType> {
         ...error,
       },
       message,
+      resolvedAt: null,
     }))
   }
 }

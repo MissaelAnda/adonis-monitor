@@ -17,5 +17,5 @@ export const formatHandler = (handler: HandlerInfo) => {
         return str
     }
 
-    return handler.name
+    return handler.name || 'Internal'
 }

@@ -53,14 +53,14 @@ Registers all authorization calls with data and result.
 ## Roadmap
 
 - [ ] Move the monitor folder to it's own project in a monorepo style using turborepo.
-- [ ] Build a pretty frontend with Vue, Tailwind and Inertia.
+- [x] Build a pretty frontend with Vue, Tailwind and Inertia.
 - [ ] Create a package post install script for auto configure.
 - [ ] Detach the frontend to it's own project so monitor is frontend agnostic.
 - [ ] Finish implementing all default monitors:
     - [x] Requests
     - [x] Errors
     - [x] Cache
-    - [ ] Bouncer
+    - [x] Bouncer
     - [x] Events
     - [x] Logs
     - [ ] Mail (with a html preview)
@@ -69,3 +69,5 @@ Registers all authorization calls with data and result.
 - [ ] Find a way to link related entries like requests to every cache, bouncer, error, etc. that happened during the request.
 - [ ] Fix the config file types.
 - [ ] Add customizable filters and ordering.
+- [ ] Add polling, WebSockets or SSE or all to refresh the entries in every index page.
+- [ ] Add a global search feature

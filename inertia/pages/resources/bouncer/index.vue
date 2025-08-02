@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { DateTime } from 'luxon';
+import ExecutedAt from '~/components/ExecutedAt.vue';
 import ResourceIndex, { Fields } from '~/components/ResourceIndex.vue';
-import Tooltip from '~/components/Tooltip.vue';
-import { MonitorPageProps } from '~/types';
+import { MonitorIndexPageProps } from '~/types';
 
-defineProps<MonitorPageProps>()
+const { entries } = defineProps<MonitorIndexPageProps>()
 
 const fields: Fields = [
   { name: 'user', title: 'User' },
@@ -16,14 +15,16 @@ const fields: Fields = [
 
 <template>
   <ResourceIndex :fields :pagination :entries>
-    <template #user="{ entry }">{{ entry.payload.user.id }}</template>
-    <template #action="{ entry }">{{ entry.payload.action }}</template>
-    <template #result="{ entry }">{{ entry.payload.result.authorized ? 'Allowed' : 'Denied' }}</template>
+    <template #user="{ entry }">{{ entry.payload.user?.id || 'Unauthenticated' }}</template>
+    <template #action="{ entry }">{{ entry.payload.action || 'Anonymous ability' }}</template>
+    <template #result="{ entry }">
+      <span class="font-lg text-green-200 bg-green-600 rounded px-2 py-1"
+        :class="{ 'text-red-100 bg-red-700': !entry.payload.response.authorized }">{{
+          entry.payload.response.authorized ? 'Allowed' : 'Denied' }}
+      </span>
+    </template>
     <template #ts="{ entry }">
-      <Tooltip>
-        <span>{{ DateTime.fromISO(entry.ts).toRelative({ style: 'short' }) }}</span>
-        <template #tooltip>{{ DateTime.fromISO(entry.ts).toFormat('yyyy-LL-dd HH:mm:ii ZZZZ') }}</template>
-      </Tooltip>
+      <ExecutedAt :ts="entry.ts" />
     </template>
   </ResourceIndex>
 </template>

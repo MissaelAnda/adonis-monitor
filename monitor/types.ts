@@ -49,7 +49,7 @@ export type MonitorBaseConfig<Type extends EntryType> = {
 export type Handler = string | Function | [LazyImport<Constructor<any>> | Constructor<any>, string?]
 export type HandlerInfo = {
   type: 'function' | 'class' | 'name',
-  name: string,
+  name: string | null,
   handler?: string,
 }
 

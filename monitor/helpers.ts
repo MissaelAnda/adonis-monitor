@@ -12,7 +12,7 @@ export const formatHandler = (handler: Handler): HandlerInfo => {
     if (typeof handler == 'string') {
         return {
             type: 'name',
-            name: handler,
+            name: handler || null,
         }
     }
 
@@ -21,7 +21,7 @@ export const formatHandler = (handler: Handler): HandlerInfo => {
     return {
         type: 'class',
         name: klass.name,
-        handler: handle,
+        handler: handle || 'handle',
     }
 }
 
@@ -31,4 +31,23 @@ const anonymousFunctionFormatter = (func: Function): string => {
         name += ` ${func.name || `\`${func.toString()}\``}`
     }
     return name
+}
+
+type Object = Record<string, any>
+export const removeSensitiveData = (patterns: RegExp[], ...records: Object[]): Object => {
+    if (patterns.length == 0) {
+        return records
+    }
+
+    for (const sensitivePayload of records.filter(part => !!part)) {
+        Object.keys(sensitivePayload).forEach(key => {
+            for (const pattern of patterns) {
+                if (pattern.test(key)) {
+                    sensitivePayload[key] = '********'
+                }
+            }
+        })
+    }
+
+    return records
 }

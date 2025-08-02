@@ -28,16 +28,10 @@ const buildUrl = (entry: Entry) => `${monitor.url}${resourceRoute.value}/${entry
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow flex-1 flex flex-col min-h-0">
     <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-        <!-- <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</h2> -->
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-500 dark:text-gray-400">
             Showing {{ allEntries!.length }} of total {{ pagination!.total }}
-            <!-- <span v-if="isLoading" class="ml-2 text-blue-500">Loading...</span> -->
           </span>
-          <!-- <button
-            class="px-3 sm:px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-            Export All
-          </button> -->
         </div>
       </div>
     </div>
@@ -53,30 +47,25 @@ const buildUrl = (entry: Entry) => `${monitor.url}${resourceRoute.value}/${entry
         </div>
       </div>
       <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No results found</h3>
-      <!-- <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search terms or clear the search to see all
-        orders.</p> -->
     </div>
 
     <div v-else class="hidden sm:block flex-1 min-h-0">
       <div class="overflow-x-auto h-full flex flex-col">
-        <table class="w-full flex-shrink-0">
-          <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                v-for="field in fields" :key="field.name">
-                {{ field.title }}
-              </th>
-              <th
-                class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-        </table>
-
         <div ref="tableContainer" class="flex-1 overflow-y-auto">
-          <table class="w-full">
+          <table class="w-full flex-shrink-0">
+            <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  v-for="field in fields" :key="field.name">
+                  {{ field.title }}
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
             <tbody class="bg-white dark:bg-gray-800">
               <tr v-for="entry in allEntries" :key="entry.id"
                 class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-700">
@@ -84,9 +73,9 @@ const buildUrl = (entry: Entry) => `${monitor.url}${resourceRoute.value}/${entry
                   v-for="(field, id) in fields" :key="id">
                   <slot :name="field.name" :entry="entry" />
                 </td>
-                <td class="py-3 whitespace-nowrap text-center text-sm font-medium">
+                <td class="py-3 whitespace-nowrap text-center text-sm font-medium relative">
                   <Link as="button" :href="buildUrl(entry)" preserve-state preserve-scroll
-                    class="text-blue-600 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 mr-3 pointer">
+                    class="text-blue-600 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 mr-3 cursor-pointer">
                   View
                   </Link>
                   <Dropdown />
@@ -101,13 +90,17 @@ const buildUrl = (entry: Entry) => `${monitor.url}${resourceRoute.value}/${entry
                 onFinish: () => allEntries = [...allEntries!, ...(entries ?? [])],
               }">
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:border-gray-700">
-                  <template v-if="pagination!.hasMorePages">
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    <span class="text-sm">Loading more entries...</span>
-                  </template>
-                  <template v-else>
-                    <span class="text-sm space-x-2 text-gray-500 dark:text-gray-400">No more entries to load.</span>
-                  </template>
+                  <td colspan="100%" class="text-center py-4">
+                    <template v-if="pagination!.hasMorePages">
+                      <div class="w-full h-full flex justify-center">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-4"></div>
+                        <span class="text-sm space-x-2 text-gray-500 dark:text-gray-400">Loading more entries...</span>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <span class="text-sm space-x-2 text-gray-500 dark:text-gray-400">No more entries to load.</span>
+                    </template>
+                  </td>
                 </tr>
               </WhenVisible>
             </tbody>

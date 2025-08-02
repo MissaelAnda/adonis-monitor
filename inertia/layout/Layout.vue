@@ -22,11 +22,11 @@ const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value }
       <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div class="flex items-center justify-between px-4 sm:px-6 py-4">
+          <div class="flex items-center justify-between px-4 sm:px-6 py-3">
             <div class="flex items-center space-x-4">
               <!-- Mobile menu button -->
               <button @click="toggleMobileSidebar"
-                class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
                 <div class="w-5 h-5">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

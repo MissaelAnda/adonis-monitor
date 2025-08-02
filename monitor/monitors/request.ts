@@ -7,7 +7,7 @@ import type { EntryFilterFn, EntryTransformerFn, HandlerInfo, MonitorBaseConfig 
 import { ApplicationService } from "@adonisjs/core/types"
 import monitor from "../service/main.js"
 import { Response } from '@adonisjs/http-server'
-import { formatHandler } from "../helpers.js"
+import { formatHandler, removeSensitiveData } from "../helpers.js"
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -63,7 +63,7 @@ export class RequestMonitor extends Monitor<RequestType> {
   }
 
   get transformers() {
-    return [this.#truncateResponseBody(), this.#removeSensitiveData(), ...super.transformers]
+    return [this.#truncateResponseBody(), this.$removeSensitiveData(), ...super.transformers]
   }
 
   get defaultConfig() {
@@ -144,28 +144,21 @@ export class RequestMonitor extends Monitor<RequestType> {
     }
   }
 
-  #removeSensitiveData(): EntryTransformerFn<RequestType> {
+  $removeSensitiveData(): EntryTransformerFn<RequestType> {
     return (payload) => {
-      const patterns = this.config.sensitiveDataPatterns
-
-      if (patterns.length == 0) {
-        return payload
-      }
-
-      let sensitiveParts: Record<string, any>[] = [payload.request.body, payload.request.headers, payload.response.headers]
+      let sensitiveParts = [payload.request.body, payload.request.headers, payload.response.headers]
 
       if (typeof payload.response.body == 'object') {
         sensitiveParts.push(payload.response.body)
       }
 
-      for (const sensitivePayload of sensitiveParts.filter(part => !!part)) {
-        Object.keys(sensitivePayload).forEach(key => {
-          for (const pattern of patterns) {
-            if (pattern.test(key)) {
-              sensitivePayload[key] = '********'
-            }
-          }
-        })
+      const records = removeSensitiveData(this.config.sensitiveDataPatterns, ...sensitiveParts)
+
+      payload.request.body = records[0]
+      payload.request.headers = records[1]
+      payload.response.headers = records[2]
+      if (typeof payload.response.body == 'object') {
+        payload.response.body = records[3]
       }
 
       return payload
