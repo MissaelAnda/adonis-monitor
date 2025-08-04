@@ -52,7 +52,7 @@ Registers all authorization calls with data and result.
 
 ## Roadmap
 
-- [ ] Move the monitor folder to it's own project in a monorepo style using turborepo.
+- [x] Move the monitor folder to it's own project in a monorepo style using turborepo.
 - [x] Build a pretty frontend with Vue, Tailwind and Inertia.
 - [ ] Create a package post install script for auto configure.
 - [ ] Detach the frontend to it's own project so monitor is frontend agnostic.
