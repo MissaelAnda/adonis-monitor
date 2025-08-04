@@ -57,15 +57,17 @@ Registers all authorization calls with data and result.
 - [ ] Create a package post install script for auto configure.
 - [ ] Detach the frontend to it's own project so monitor is frontend agnostic.
 - [ ] Finish implementing all default monitors:
-    - [x] Requests
-    - [x] Errors
-    - [x] Cache
-    - [x] Bouncer
-    - [x] Events
-    - [x] Logs
-    - [ ] Mail (with a html preview)
-    - [x] Query
-    - [ ] Commands
+  - [x] Requests
+  - [ ] Errors
+    - [ ] Collapse entries occurrences by error type (preferible at the backend side rather than the frontend side)
+    - [ ] Find a way to implement Youch or something familiar to the entry view
+  - [x] Cache
+  - [x] Bouncer
+  - [x] Events
+  - [x] Logs
+  - [ ] Mail (with a html preview)
+  - [x] Query
+  - [ ] Commands
 - [ ] Find a way to link related entries like requests to every cache, bouncer, error, etc. that happened during the request.
 - [ ] Fix the config file types.
 - [ ] Add customizable filters and ordering.

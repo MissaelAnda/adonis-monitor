@@ -1,0 +1,12 @@
+{
+  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "my-turborepo/apps/playground/build"
+  },
+  "exclude": [
+    "./inertia/**/*",
+    "node_modules",
+    "my-turborepo/apps/playground/build"
+  ]
+}
